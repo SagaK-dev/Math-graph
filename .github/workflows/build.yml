@@ -1,0 +1,26 @@
+name: Build and test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Build JAR
+        run: sh build_unix.sh
+      - name: Run tests
+        run: |
+          java -jar GeoSketch.jar --self-test /tmp/smoke.png
+          java -jar GeoSketch.jar --feature-test /tmp/features.png
+          java -jar GeoSketch.jar --geometry-test /tmp/geometry.png
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GeoSketch-jar
+          path: GeoSketch.jar
